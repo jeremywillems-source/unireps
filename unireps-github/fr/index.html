@@ -1,0 +1,664 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Airbnb Uni Reps — FR Rep Leaderboard</title><link rel="preconnect" href="https://a0.muscache.com" crossorigin><meta name="robots" content="noindex,nofollow"><style>
+  .gate{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .gcard{width:100%;max-width:380px;padding:32px 24px;border-radius:var(--r16);box-shadow:var(--e2);text-align:center}
+  .gcard .logo{color:var(--rausch);margin-bottom:12px}
+  .gcard h2{font-size:22px;line-height:26px;margin:0 0 4px}
+  .gcard p{font-size:14px;line-height:20px;color:var(--foggy);margin:0 0 20px}
+  .gcard input{width:100%;font:inherit;font-size:16px;line-height:20px;padding:12px 14px;border:1px solid var(--deco);border-radius:var(--r8);color:var(--hof);text-align:center;letter-spacing:.04em}
+  .gcard input:focus{outline:2px solid var(--hof);outline-offset:1px}
+  .gcard button{width:100%;margin-top:12px;font:inherit;font-size:16px;line-height:20px;font-weight:600;padding:14px;border:0;border-radius:var(--r8);background:var(--rausch);color:#fff;cursor:pointer}
+  .gcard button:hover{background:var(--product-rausch)}
+  .gerr{color:var(--arches);font-size:14px;line-height:18px;margin-top:10px;min-height:18px}
+  .fresh{margin:32px 0 8px;font-size:14px;line-height:20px}.fresh summary{cursor:pointer;font-weight:600;color:var(--hof)}.fresh .hint{margin:8px 0 12px}
+  /* internal extras: totals row, CSV button */
+  tfoot tr.tot td{border-top:1px solid var(--hof);border-bottom:0;padding-top:12px;font-weight:500}
+  .csv{font:inherit;font-size:14px;line-height:18px;font-weight:600;padding:8px 14px;border:1px solid var(--hof);border-radius:var(--r8);background:#fff;color:var(--hof);cursor:pointer;margin-left:12px}
+  .csv:hover{background:var(--faint)}
+  /* expandable rep rows (Incl. societies view) */
+  tr.exp{cursor:pointer}
+  tr.exp .chev{display:inline-block;width:6px;height:6px;border-right:1.5px solid var(--foggy);border-bottom:1.5px solid var(--foggy);transform:rotate(-45deg);margin:0 10px 2px 2px;transition:transform .15s}
+  tr.exp.open .chev{transform:rotate(45deg)}
+  tr.det{display:none}
+  tr.exp.open + tr.det{display:table-row}
+  tr.det>td{padding-top:0;padding-bottom:16px;background:var(--faint)}
+  tr.exp.open>td{background:var(--faint)}
+  .dtl{width:100%;font-size:13px;line-height:18px;margin-top:4px}
+  .dtl th{font-size:11px;letter-spacing:.02em;color:var(--foggy);font-weight:500;padding:6px 10px;border-bottom:1px solid var(--deco);text-align:right}
+  .dtl th:first-child,.dtl td:first-child{text-align:left}
+  .dtl td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--bebe)}
+  .dtl tr:last-child td{border-bottom:0}
+  .dtl code{font:inherit;color:var(--hof)}
+  .tg{font-size:11px;line-height:16px;color:var(--foggy);border:1px solid var(--deco);border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:middle}
+  /* editorial direction (chosen 2 Sept): white page, hairline KPI row, top three as a list, Rausch only on the winning figure */
+  .masth{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:56px 0 40px;padding-bottom:24px;border-bottom:1px solid var(--hof)}
+  .masth h1{font-size:40px;line-height:44px;font-weight:600;margin:0;letter-spacing:-.01em;color:var(--hof)}
+  .masth .sub{font-size:16px;line-height:22px;color:var(--foggy);margin-top:8px}
+  .masth .seg{margin-left:auto}
+  @media(max-width:900px){.masth{margin:24px 0 20px;padding-bottom:16px;gap:12px}.masth h1{font-size:28px;line-height:32px}.masth .sub{font-size:14px;line-height:18px;margin-top:4px}.masth .seg{margin-left:0}.seg button{padding:8px 12px}.empty{margin:24px 0;padding:20px 16px;font-size:14px;line-height:20px}}
+  @media(max-width:680px){
+    /* narrow screens: keep rank · name · signed up · nights · GBV, drop the rest */
+    #tbl th:nth-child(3),#tbl td:nth-child(3),#tbl th:nth-child(4),#tbl td:nth-child(4),#tbl th:nth-child(6),#tbl td:nth-child(6),#tbl th:nth-child(7),#tbl td:nth-child(7){display:none}}
+
+  /* Airbnb Cereal — DLS fontFamilyCereal; Book/Medium/Bold faces map to weightBook400 / Medium500 / Semibold600+Bold700 */
+  @font-face{font-family:'Airbnb Cereal';font-weight:400;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Book-9a1c9cca9bb3d65fefa2aa487617805e.woff2") format("woff2")}
+  @font-face{font-family:'Airbnb Cereal';font-weight:500;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Medium-50fc004b3082375f12ff0cfb67bf8e56.woff2") format("woff2")}
+  @font-face{font-family:'Airbnb Cereal';font-weight:600 700;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Bold-bdfb98485e7836ba31b456f65cded088.woff2") format("woff2")}
+
+  /* DLS tokens — colors.md / corner-radius.md / elevation.md / spacing.md / typography.md */
+  :root{
+    --hof:#222222;--foggy:#6A6A6A;--bobo:#B0B0B0;--deco:#DDDDDD;--bebe:#EBEBEB;--faint:#F7F7F7;--white:#FFFFFF;
+    --rausch:#FF385C;--product-rausch:#E00B41;--spruce:#008A05;--arches:#C13515;--ondo:#E07912;--capiz:#F7F6F2;
+    --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r32:32px;
+    --e0:0 0 0 1px #DDDDDD inset;
+    --e1:0 0 0 1px rgba(0,0,0,.02),0 2px 4px rgba(0,0,0,.16);
+    --e2:0 0 0 1px rgba(0,0,0,.02),0 2px 6px rgba(0,0,0,.04),0 4px 8px rgba(0,0,0,.10);
+    --e3:0 0 0 1px rgba(0,0,0,.02),0 8px 24px rgba(0,0,0,.10);
+    --g1:#E8B84B;--g2:#B0B0B0;--g3:#C98A5B;   /* medal colours — leaderboard idiom, not DLS */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--white);color:var(--hof);-webkit-font-smoothing:antialiased;
+    font-family:'Airbnb Cereal','Airbnb Cereal VF','Circular',-apple-system,BlinkMacSystemFont,'Roboto','Helvetica Neue',sans-serif;
+    font-size:14px;line-height:18px;font-weight:400}                        /* body.text_14_18 */
+  b,strong{font-weight:600}
+
+  /* top bar */
+  .bar .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:8px;color:var(--rausch)}
+  .bar .nm{font-size:16px;line-height:20px;font-weight:600;color:var(--hof)}   /* titles.semibold_16_20 */
+  .bar .tag{margin-left:auto;font-size:12px;line-height:16px;color:var(--foggy)} /* caption.text_12_16 */
+
+  /* hero — rauschGradient.linearGradient is left-to-right */
+  .hero{background:linear-gradient(90deg,var(--rausch) 0%,var(--product-rausch) 100%);color:#fff;padding:48px 24px 56px;text-align:center}
+  .hero h1{font-size:40px;line-height:44px;font-weight:600;margin:0;letter-spacing:-.01em} /* specialDisplay.medium_40_44 */
+  .hero .sub{font-size:16px;line-height:22px;margin-top:8px;opacity:.92}                /* subtitles.book_16_22 */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px 64px}
+
+  /* KPI strip — cards on elevation1, medium12px radius, micro16/24 padding */
+  .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:-28px 0 40px}
+  .s{text-align:center;padding:20px 16px;border-radius:var(--r12);background:var(--white);box-shadow:var(--e1)}
+  .s .v{font-size:26px;line-height:30px;font-weight:600}                                /* titles.semibold_26_30 */
+  .s .l{font-size:12px;line-height:16px;color:var(--foggy);margin-top:4px;text-transform:uppercase;letter-spacing:.04em} /* caption + trackingWide */
+
+  /* podium */
+  .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:end;margin-bottom:40px}
+  @media(max-width:680px){
+    /* phone: all three podium cards on screen at once, side by side like desktop, scaled to the viewport */
+    .podium{grid-template-columns:1fr 1.15fr 1fr;gap:8px;margin-bottom:24px;align-items:end}
+    .p{padding:12px 6px;border-radius:var(--r12)}
+    .p.one{padding:16px 6px;box-shadow:0 0 0 1px rgba(0,0,0,.02),0 2px 6px rgba(0,0,0,.04),0 4px 8px rgba(0,0,0,.10)}
+    .medal{width:26px;height:26px;font-size:12px;margin-bottom:6px}.one .medal{width:32px;height:32px;font-size:14px}
+    .p .who{font-size:clamp(12px,3.6vw,15px);line-height:1.2;overflow-wrap:break-word}.one .who{font-size:clamp(14px,4.2vw,17px)}
+    .p .whr{font-size:clamp(9px,2.6vw,12px);line-height:1.3;overflow-wrap:break-word;hyphens:auto}
+    .p .big{font-size:clamp(22px,7vw,30px);line-height:1.05;margin-top:6px}.one .big{font-size:clamp(28px,9vw,38px)}
+    .p .cap{font-size:9px;line-height:12px;letter-spacing:0}
+    .p .meta{display:none}   /* trips · nights · GBV live in the table on phones */
+    .seg{display:flex;width:100%}.seg button{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap}
+    th{padding:0 8px 10px;font-size:11px}td{padding:12px 8px}   /* rank · name · signed up · nights · GBV fit a 375px screen */
+    .lk{display:none}        /* the links chip is diagnostic; it costs half a column on a phone */
+    .dtl th:nth-child(2),.dtl td:nth-child(2),.dtl th:nth-child(4),.dtl td:nth-child(4),.dtl th:nth-child(5),.dtl td:nth-child(5){display:none}
+    .seg{display:flex;width:100%}.seg button{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap}
+    th{padding:0 8px 10px;font-size:11px}td{padding:12px 8px}   /* rank · name · signed up · nights · GBV fit a 375px screen */}
+  .p{border-radius:var(--r16);padding:24px 16px;text-align:center;background:var(--white);box-shadow:var(--e0)}
+  .p.one{box-shadow:var(--e2);padding:32px 16px}
+  .medal{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;margin:0 auto 12px;background:var(--g2)}
+  .one .medal{background:var(--g1);width:44px;height:44px;font-size:18px}
+  .three .medal{background:var(--g3)}
+  .p .who{font-size:18px;line-height:24px;font-weight:600}       /* titles.semibold_18_24 */
+  .one .who{font-size:22px;line-height:26px}                     /* titles.semibold_22_26 */
+  .p .whr{font-size:14px;line-height:18px;color:var(--foggy)}    /* subtitles.book_14_18 */
+  .p .big{font-size:32px;line-height:36px;font-weight:600;color:var(--rausch);margin-top:12px} /* titles.semibold_32_36 */
+  .one .big{font-size:40px;line-height:44px}
+  .p .cap{font-size:12px;line-height:16px;color:var(--foggy);text-transform:uppercase;letter-spacing:.04em}
+  .p .meta{font-size:14px;line-height:18px;color:var(--foggy);margin-top:12px;padding-top:12px;border-top:1px solid var(--bebe)}
+
+  /* section head + segmented control (pill: xxxlarge32px, faint track, elevation1 thumb) */
+  h2{font-size:22px;line-height:26px;font-weight:600;margin:0}   /* titles.semibold_22_26 */
+  .head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .seg{margin-left:auto;display:inline-flex;border-radius:var(--r32);padding:4px;background:var(--faint)}
+  .seg button{font:inherit;font-size:14px;line-height:18px;font-weight:500;color:var(--foggy);background:none;border:0;
+    padding:8px 16px;border-radius:var(--r32);cursor:pointer;transition:background .2s cubic-bezier(.2,0,0,1),color .2s}
+  .seg button:hover{color:var(--hof)}
+  .seg button.on{background:var(--white);color:var(--hof);box-shadow:var(--e1)}
+  .seg2{margin-left:0}
+  .hint{font-size:14px;line-height:20px;color:var(--foggy);margin-bottom:16px}       /* bodyParagraphs.text_14_20 */
+  .vh{font-size:18px;line-height:24px;font-weight:600;margin:16px 0 4px}
+  .view[hidden]{display:none}
+
+  /* tables — bebe hairlines, 16px rows, caption headers */
+  table{width:100%;border-collapse:collapse;font-size:14px;line-height:18px}
+  th{font-size:12px;line-height:16px;font-weight:500;color:var(--foggy);padding:0 12px 12px;text-align:right;white-space:nowrap}
+  th[data-k]{cursor:pointer}th[data-k]:hover{color:var(--hof)}th.s2{color:var(--hof);font-weight:600;box-shadow:inset 0 -2px 0 var(--hof)}
+  th:nth-child(1),th:nth-child(2),th:nth-child(3),th:nth-child(4){text-align:left}
+  .wow th:nth-child(3){text-align:left}
+  td{padding:14px 12px;text-align:right;border-top:1px solid var(--bebe);white-space:nowrap}
+  td:nth-child(1),td:nth-child(2),td:nth-child(3),td:nth-child(4){text-align:left}
+  .wow td:nth-child(4){text-align:right}
+  td .dim,td.dim{color:var(--foggy)}
+  tbody tr:hover{background:var(--faint)}
+  .rk{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--faint);align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--foggy)}
+  .rk.t1{background:var(--g1);color:#fff}.rk.t2{background:var(--g2);color:#fff}.rk.t3{background:var(--g3);color:#fff}
+  .lk{font-size:12px;line-height:16px;color:var(--foggy);margin-left:8px;box-shadow:var(--e0);border-radius:var(--r32);padding:2px 8px;cursor:help}
+  .bdg{font-size:12px;line-height:16px;color:var(--hof);background:var(--faint);border-radius:var(--r4);padding:2px 8px;white-space:nowrap}
+  .sub2{font-size:12px;line-height:16px;color:var(--foggy);font-weight:400}
+
+  /* week-on-week */
+  .wowhead{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .wowhead .hint{flex:1;min-width:260px}
+  .sp{color:var(--bobo);display:block}
+  .sp.big{width:100%;height:56px;color:var(--rausch)}
+  td.tr{padding-top:8px;padding-bottom:8px}
+  .wow td.cur{font-weight:600}
+  .dup{color:var(--spruce);font-weight:600}.ddn{color:var(--arches);font-weight:600}.d0{color:var(--bobo)}
+  .prog{border-radius:var(--r12);box-shadow:var(--e0);padding:16px 16px 12px;margin:16px 0 24px;background:var(--white)}
+  .pl{font-size:12px;line-height:16px;color:var(--foggy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+  .pl2{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;line-height:16px;color:var(--foggy);margin-top:8px}
+  .pl2 b{color:var(--hof)}
+  #m-l[hidden]{display:none}#m-v[hidden]{display:none}
+
+  /* excluded-links note — InlineBanner-style: capiz surface, ondo accent */
+  .note{border-radius:var(--r12);background:var(--capiz);border-left:4px solid var(--ondo);padding:16px 20px;margin:40px 0 0;font-size:14px;line-height:20px}
+  .note h3{margin:0 0 4px;font-size:16px;line-height:20px;font-weight:600}
+  .note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:var(--r4)}
+  .note table{margin-top:12px;font-size:14px}
+  .note th,.note td{text-align:right;padding:10px 12px}.note th:first-child,.note td:first-child{text-align:left}
+  .foot{font-size:12px;line-height:16px;color:var(--foggy);margin-top:24px;border-top:1px solid var(--bebe);padding-top:16px}
+
+  .empty{margin:40px 0;padding:32px 24px;border-radius:var(--r12);box-shadow:var(--e0);text-align:center;font-size:16px;line-height:22px;color:var(--foggy)}
+  .empty b{color:var(--hof);font-weight:600}
+  .ctl{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin:0 0 16px}
+  .ctl label{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:16px;color:var(--foggy)}
+  .ctl select,.ctl input{font:inherit;font-size:14px;line-height:18px;color:var(--hof);background:var(--white);border:1px solid var(--deco);border-radius:var(--r8);padding:10px 12px;min-width:220px}
+  .ctl select:focus,.ctl input:focus{outline:2px solid var(--hof);outline-offset:1px}
+  .ctln{font-size:12px;line-height:16px;color:var(--foggy);padding-bottom:12px}
+  .ctl[hidden]{display:none}
+  tr[hidden]{display:none}</style></head><body>
+<div id="app"><div class="bar"><div class="in"><svg viewBox="0 0 280 280" width="30" height="30" aria-hidden="true"><path d="M207.85193,171.52512c-.67291-1.89222-1.459-3.72349-2.20736-5.41991-1.15158-2.60914-2.35776-5.22358-3.52433-7.751l-.09233-.20064c-10.40562-22.57508-21.57415-45.45863-33.19465-68.0149l-.49312-.95772c-1.18539-2.30335-2.41093-4.685-3.66839-7.02514a45.65189,45.65189,0,0,0-5.39665-8.32128,25.13332,25.13332,0,0,0-38.55561.00485,45.84589,45.84589,0,0,0-5.39352,8.31984c-1.26856,2.36112-2.50543,4.76482-3.70146,7.08945l-.45807.88975c-11.621,22.558-22.78929,45.4415-33.19466,68.01466l-.15158.32875c-1.14648,2.48588-2.33186,5.05685-3.46433,7.62248-.74836,1.69493-1.53375,3.52477-2.20741,5.42179a33.29192,33.29192,0,0,0-1.78924,16.20018A32.03447,32.03447,0,0,0,89.958,212.78942a32.50906,32.50906,0,0,0,12.28645,2.38092,34.36789,34.36789,0,0,0,3.95843-.23059,40.33879,40.33879,0,0,0,15.10881-5.10709c6.09406-3.43,12.11293-8.45687,18.68823-15.64038,6.5751,7.18351,12.594,12.21036,18.68823,15.64038a40.33042,40.33042,0,0,0,15.10855,5.10709,34.37651,34.37651,0,0,0,3.95893.23059,32.5134,32.5134,0,0,0,12.28526-2.38092,32.037,32.037,0,0,0,19.60025-25.06318A33.317,33.317,0,0,0,207.85193,171.52512ZM140,179.35639c-8.13975-10.3365-13.36263-19.93524-15.19534-27.98217a24.80293,24.80293,0,0,1-.52262-9.22557,15.10192,15.10192,0,0,1,2.42231-6.30748,16.77871,16.77871,0,0,1,26.59253.00173,15.10053,15.10053,0,0,1,2.42206,6.30867,24.80048,24.80048,0,0,1-.525,9.22894C153.35921,159.42644,148.13751,169.02231,140,179.35639Zm60.13431,7.009a22.40124,22.40124,0,0,1-13.70416,17.52482,23.36284,23.36284,0,0,1-11.52481,1.51028,30.40262,30.40262,0,0,1-11.5069-3.93719c-5.42471-3.0534-10.91616-7.74089-17.09532-14.61688,9.83691-12.15234,15.97954-23.35319,18.25412-33.33a34.29255,34.29255,0,0,0,.65411-12.82357,24.61291,24.61291,0,0,0-3.99374-10.28042,26.35923,26.35923,0,0,0-42.43424-.00193,24.61937,24.61937,0,0,0-3.99349,10.27774,34.30155,34.30155,0,0,0,.65049,12.81852c2.27315,9.98067,8.41628,21.1845,18.2565,33.34021-6.17936,6.87549-11.6708,11.563-17.09552,14.61638a30.39629,30.39629,0,0,1-11.50669,3.93719,23.369,23.369,0,0,1-11.52551-1.51028,22.39753,22.39753,0,0,1-13.703-17.52482A23.61049,23.61049,0,0,1,81.19829,174.741c.53683-1.51177,1.1651-2.99542,1.94341-4.75808,1.10108-2.49409,2.26953-5.02877,3.39982-7.4798l.15178-.32926c10.34716-22.44676,21.45356-45.20313,33.01125-67.63806l.45975-.89317c1.17667-2.28716,2.3935-4.6519,3.62121-6.93693a37.11918,37.11918,0,0,1,4.24027-6.63331,15.5321,15.5321,0,0,1,23.94546-.00193,36.945,36.945,0,0,1,4.24077,6.63089c1.21632,2.26473,2.4225,4.60818,3.58908,6.87435l.49455.96109c11.5567,22.43226,22.66285,45.18863,33.011,67.639l.09332.20208c1.15008,2.49216,2.33889,5.06843,3.458,7.60554.77979,1.76553,1.40876,3.25017,1.94444,4.75659A23.63037,23.63037,0,0,1,200.13426,186.36536Z" fill="currentColor"/></svg><span class="nm">Airbnb Uni Reps</span><span class="tag">France</span></div></div>
+<div class="hero"><h1>FR Rep Leaderboard</h1><div class="sub" id="status">Loading the latest numbers…</div></div></div>
+<script>
+/* Shared by build-uk-reps.mjs (static pages), publish-uk-reps.mjs (agency Sheet) and the live pages.
+
+   DATA  → the agency Sheet holds RAW per-link data (tabs: meta · links · weekly). Any dashboard
+           aggregates it its own way, and the Sheet doubles as the downloadable dataset.
+   MODEL → prepare(rows, mapping, weekly, {board, includeSocieties}) → {meta, reps, unis, orphans}
+           board = 'reps'      : uni reps. includeSocieties adds each society's numbers to its
+                                 owner_rep (Parameter Mapping sheet column `owner_rep`, arriving ~mid Sept).
+           board = 'societies' : societies, each showing which rep owns it.
+   VIEW  → renderBody(model) → HTML string. Pure — no Node, no DOM — the same function renders the
+           static build and runs inline in the live pages. One renderer, no drift. */
+
+const fmt    = v => Math.round(+v || 0).toLocaleString('en-GB');
+const money  = v => '$' + fmt(v);
+const moneyK = v => v >= 1000 ? '$' + Math.round(v / 1000) + 'k' : money(v);
+const esc    = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const pct    = (a, b) => b ? (a / b * 100).toFixed(1) + '%' : '–';
+const TYPE = { unirep: 'Uni rep', society: 'Society', influencer: 'Creator', whatsappcommunity: 'WhatsApp' };
+const SHOW_N = 10;
+const norm = s => String(s ?? '').trim();
+const key  = s => norm(s).toLowerCase();
+/* rows in the mapping sheet that are not a person or group: the 'Unattributed'/social catch-all */
+const isCatchAll = p => /^unattributed$/i.test(norm(p.name)) || key(p.parameter_value) === 'social';
+/* cohort filter: campaign_name (sheet column J) must contain the configured cohort, e.g. '2026/27' */
+const inCohort = (p, cohort) => !cohort || String(p.campaign_name || '').includes(cohort);
+/* nameAliases (config): merge rows the sheet names differently for the same person, e.g.
+   {"Quentin Faivre Liste A": "Quentin Faivre"}. The sheet is still the source of truth — this is a
+   patch until the names are made identical there. */
+const canon = (name, aliases) => (aliases && aliases[norm(name)]) || norm(name);
+/* linkOverrides (config): patch individual mapping rows by parameter_value, e.g.
+   {"trentsnowsports": {"name": "Trent Snowsports", "owner_rep": "Beth Colin-Thome"}} — for sheet rows where a
+   society link carries the rep's name instead of the society's. Apply once, before prepare()/toRawTables(). */
+const patchMapping = (PMAP, overrides) => !overrides ? PMAP
+  : PMAP.map(p => { const o = overrides[key(p.parameter_value)]; return o ? { ...p, ...o } : p; });
+
+/* ---------------- MODEL ---------------- */
+function prepare(ROWS, PMAP, WK, { through, board = 'reps', includeSocieties = false, cohort = '', market = 'UK', marketName = 'United Kingdom', nameAliases = null } = {}) {
+  const WEEKS = (WK.weeks || []).filter(w => w <= through);
+  const byParam = new Map(PMAP.map(p => [key(p.parameter_value), p]));
+  const hasOwners = PMAP.some(p => norm(p.owner_rep));
+  const ents = new Map(), orphans = [];
+  const ent = (key, p) => {
+    let d = ents.get(key);
+    if (!d) ents.set(key, d = { name: key, links: [], det: [], own: 0, soc: 0, impr: 0, verified: 0, bk: 0, ni: 0, gbv: 0,
+      type: TYPE[p.parameter_type] || p.parameter_type, school: p.school_name === 'N/A' ? '—' : (p.school_name || '—'),
+      owner: norm(p.owner_rep) || '', wl: WEEKS.map(() => 0), wv: WEEKS.map(() => 0) });
+    return d;
+  };
+  for (const [sa, users, verified, bk, ni, gbv, impr] of ROWS) {
+    const p = byParam.get(sa);
+    if (!p) { orphans.push({ sa, verified, ni, impr }); continue; }
+    if (isCatchAll(p) || !inCohort(p, cohort)) continue;   /* known link, other cohort or catch-all: not an orphan, not on the board */
+    let d = null, viaSociety = false;
+    if (board === 'reps') {
+      if (p.parameter_type === 'unirep') d = ent(canon(p.name, nameAliases), p);
+      else if (includeSocieties && p.parameter_type === 'society' && norm(p.owner_rep)) {
+        d = ent(norm(p.owner_rep), { ...p, parameter_type: 'unirep', school_name: p.school_name }); viaSociety = true;
+      }
+    } else if (board === 'societies') {
+      if (p.parameter_type === 'society') d = ent(canon(p.name, nameAliases), p);
+    }
+    if (!d) continue;
+    d.links.push(sa); d.impr += impr; d.verified += verified; d.bk += bk; d.ni += ni; d.gbv += gbv;
+    if (viaSociety) d.soc += verified; else d.own += verified;
+    d.det.push({ sa, label: viaSociety ? canon(p.name, nameAliases) : sa, kind: viaSociety ? 'soc' : 'own', landed: impr, verified, trips: bk, nights: ni, gbv });
+    const ser = WK.series[sa] || {};
+    WEEKS.forEach((w, i) => { const x = ser[w]; if (x) { d.wl[i] += x[0]; d.wv[i] += x[1]; } });
+  }
+  /* every member of the cohort is on the board from day one, at 0 until their first sign-up */
+  const want = board === 'reps' ? 'unirep' : 'society';
+  for (const p of PMAP) if (p.parameter_type === want && !isCatchAll(p) && inCohort(p, cohort)) {
+    const d = ent(canon(p.name, nameAliases), p); const k = key(p.parameter_value);
+    if (!d.links.includes(k)) { d.links.push(k); d.det.push({ sa: k, label: k, kind: 'own', landed: 0, verified: 0, trips: 0, nights: 0, gbv: 0 }); }   /* links without traffic still count as the rep's links */
+  }
+  /* societies owned by a rep but without traffic yet — on the reps board with includeSocieties only */
+  if (board === 'reps' && includeSocieties) for (const p of PMAP) if (p.parameter_type === 'society' && norm(p.owner_rep) && !isCatchAll(p) && inCohort(p, cohort)) {
+    const d = ents.get(norm(p.owner_rep)); const k = key(p.parameter_value);
+    if (d && !d.links.includes(k)) { d.links.push(k); d.det.push({ sa: k, label: canon(p.name, nameAliases), kind: 'soc', landed: 0, verified: 0, trips: 0, nights: 0, gbv: 0 }); }
+  }
+  for (const d of ents.values()) d.det.sort((a, b) => (a.kind === 'soc') - (b.kind === 'soc') || b.verified - a.verified || b.landed - a.landed);
+
+  const R = [...ents.values()].sort((a, b) => b.verified - a.verified || a.name.localeCompare(b.name));
+  const reps = R.map((r, i) => ({ rank: i + 1, name: r.name, school: r.school, type: r.type, owner: r.owner, links: r.links.length,
+    own: r.own, soc: r.soc, landed: r.impr, verified: r.verified, trips: r.bk, nights: r.ni, gbv: r.gbv,
+    wv: r.wv.join('|'), wl: r.wl.join('|'), detail: r.det }));
+  const um = new Map();
+  for (const r of R) {
+    const k = r.school === '—' ? 'Creators & national' : r.school;
+    const u = um.get(k) || um.set(k, { school: k, reps: 0, landed: 0, verified: 0, trips: 0, nights: 0, gbv: 0 }).get(k);
+    u.reps++; u.landed += r.impr; u.verified += r.verified; u.trips += r.bk; u.nights += r.ni; u.gbv += r.gbv;
+  }
+  const unis = [...um.values()].sort((a, b) => b.verified - a.verified).map((u, i) => ({ rank: i + 1, ...u }));
+  const T = reps.reduce((a, r) => (a.landed += r.landed, a.verified += r.verified, a.trips += r.trips, a.nights += r.nights, a.gbv += r.gbv, a), { landed: 0, verified: 0, trips: 0, nights: 0, gbv: 0 });
+  const O = orphans.reduce((a, r) => (a.impr += r.impr, a.verified += r.verified, a), { impr: 0, verified: 0 });
+  const wkTot = k => WEEKS.map((_, i) => R.reduce((a, r) => a + r[k][i], 0));
+  const meta = { through, generated: new Date().toISOString(), freshness: WK.freshness ? JSON.stringify(WK.freshness) : '', fetched: WK.fetched || '', board, cohort, market, marketName, includeSocieties: includeSocieties ? 1 : 0, hasOwners: hasOwners ? 1 : 0,
+    reps: reps.length, schools: [...new Set(reps.map(r => r.school))].sort().join('|'),
+    landed: T.landed, verified: T.verified, trips: T.trips, nights: T.nights, gbv: T.gbv,
+    weeks: WEEKS.join('|'), wk_verified: wkTot('wv').join('|'), wk_landed: wkTot('wl').join('|'),
+    orphan_links: orphans.length, orphan_landed: O.impr, orphan_verified: O.verified };
+  return { meta, reps, unis, orphans: orphans.sort((a, b) => b.impr - a.impr).map(o => ({ sa: o.sa, landed: o.impr, verified: o.verified })) };
+}
+
+/* ---------------- RAW TABLES ⇄ inputs (what the Sheet holds) ---------------- */
+const REP_TYPES = new Set(Object.keys(TYPE));
+function toRawTables(ROWS, PMAP, WK, through, cohort = '', nameAliases = null) {
+  const byParam = new Map(PMAP.map(p => [key(p.parameter_value), p]));
+  const links = [['sa', 'name', 'type', 'school', 'owner_rep', 'landers', 'verified', 'trips', 'nights', 'gbv', 'landed']];
+  const weekly = [['sa', 'week', 'landings', 'verified']];
+  const weeks = (WK.weeks || []).filter(w => w <= through);
+  for (const [sa, users, verified, bk, ni, gbv, impr] of ROWS) {
+    const p = byParam.get(sa); if (!p || !REP_TYPES.has(p.parameter_type) || isCatchAll(p) || !inCohort(p, cohort)) continue;   /* channels, unmapped, catch-all and other cohorts stay internal */
+    links.push([sa, canon(p.name, nameAliases), p.parameter_type, p.school_name || '', norm(p.owner_rep), users, verified, bk, ni, Math.round(gbv), impr]);
+    const ser = WK.series[sa] || {};
+    for (const w of weeks) { const x = ser[w]; if (x && (x[0] || x[1])) weekly.push([sa, w, x[0], x[1]]); }
+  }
+  const seen = new Set(ROWS.map(r => key(r[0])));
+  for (const p of PMAP) if (REP_TYPES.has(p.parameter_type) && !isCatchAll(p) && inCohort(p, cohort) && !seen.has(key(p.parameter_value))) {
+    seen.add(key(p.parameter_value)); links.push([key(p.parameter_value), canon(p.name, nameAliases), p.parameter_type, p.school_name || '', norm(p.owner_rep), 0, 0, 0, 0, 0, 0]);
+  }
+  const meta = [['through', 'generated', 'weeks', 'links', 'cohort', 'freshness', 'fetched', 'note'],
+                [through, new Date().toISOString(), weeks.join('|'), links.length - 1, cohort, WK.freshness ? JSON.stringify(WK.freshness) : '', WK.fetched || '',
+                 'Raw per-link data for the UK Student Rep programme. Rewritten daily; do not edit by hand. Figures indicative; commission calculated separately.']];
+  return { meta, links, weekly };
+}
+function fromRawTables(t) {
+  const obj = rows => { const [h, ...b] = rows; return b.filter(r => r.some(x => x !== '' && x != null)).map(r => Object.fromEntries(h.map((k, i) => [k, r[i] ?? '']))); };
+  const meta = obj(t.meta)[0] || {}, L = obj(t.links), W = obj(t.weekly);
+  const ROWS = L.map(l => [l.sa, +l.landers || 0, +l.verified || 0, +l.trips || 0, +l.nights || 0, +l.gbv || 0, +l.landed || 0]);
+  /* every row in the links tab is already in the cohort; stamp it so prepare(...cohort) keeps them */
+  const PMAP = L.map(l => ({ parameter_value: l.sa, name: l.name, parameter_type: l.type, school_name: l.school, owner_rep: l.owner_rep, campaign_name: meta.cohort || '' }));
+  const series = {}; for (const w of W) ((series[w.sa] ??= {})[w.week] = [+w.landings || 0, +w.verified || 0]);
+  return { ROWS, PMAP, WK: { through: meta.through, weeks: String(meta.weeks || '').split('|').filter(Boolean), series, freshness: (() => { try { return meta.freshness ? JSON.parse(meta.freshness) : null; } catch { return null; } })(), fetched: meta.fetched || '' }, through: meta.through, cohort: meta.cohort || '' };
+}
+
+/* ---------------- VIEW ---------------- */
+const belo = `<svg viewBox="0 0 280 280" width="30" height="30" aria-hidden="true"><path d="M207.85193,171.52512c-.67291-1.89222-1.459-3.72349-2.20736-5.41991-1.15158-2.60914-2.35776-5.22358-3.52433-7.751l-.09233-.20064c-10.40562-22.57508-21.57415-45.45863-33.19465-68.0149l-.49312-.95772c-1.18539-2.30335-2.41093-4.685-3.66839-7.02514a45.65189,45.65189,0,0,0-5.39665-8.32128,25.13332,25.13332,0,0,0-38.55561.00485,45.84589,45.84589,0,0,0-5.39352,8.31984c-1.26856,2.36112-2.50543,4.76482-3.70146,7.08945l-.45807.88975c-11.621,22.558-22.78929,45.4415-33.19466,68.01466l-.15158.32875c-1.14648,2.48588-2.33186,5.05685-3.46433,7.62248-.74836,1.69493-1.53375,3.52477-2.20741,5.42179a33.29192,33.29192,0,0,0-1.78924,16.20018A32.03447,32.03447,0,0,0,89.958,212.78942a32.50906,32.50906,0,0,0,12.28645,2.38092,34.36789,34.36789,0,0,0,3.95843-.23059,40.33879,40.33879,0,0,0,15.10881-5.10709c6.09406-3.43,12.11293-8.45687,18.68823-15.64038,6.5751,7.18351,12.594,12.21036,18.68823,15.64038a40.33042,40.33042,0,0,0,15.10855,5.10709,34.37651,34.37651,0,0,0,3.95893.23059,32.5134,32.5134,0,0,0,12.28526-2.38092,32.037,32.037,0,0,0,19.60025-25.06318A33.317,33.317,0,0,0,207.85193,171.52512ZM140,179.35639c-8.13975-10.3365-13.36263-19.93524-15.19534-27.98217a24.80293,24.80293,0,0,1-.52262-9.22557,15.10192,15.10192,0,0,1,2.42231-6.30748,16.77871,16.77871,0,0,1,26.59253.00173,15.10053,15.10053,0,0,1,2.42206,6.30867,24.80048,24.80048,0,0,1-.525,9.22894C153.35921,159.42644,148.13751,169.02231,140,179.35639Zm60.13431,7.009a22.40124,22.40124,0,0,1-13.70416,17.52482,23.36284,23.36284,0,0,1-11.52481,1.51028,30.40262,30.40262,0,0,1-11.5069-3.93719c-5.42471-3.0534-10.91616-7.74089-17.09532-14.61688,9.83691-12.15234,15.97954-23.35319,18.25412-33.33a34.29255,34.29255,0,0,0,.65411-12.82357,24.61291,24.61291,0,0,0-3.99374-10.28042,26.35923,26.35923,0,0,0-42.43424-.00193,24.61937,24.61937,0,0,0-3.99349,10.27774,34.30155,34.30155,0,0,0,.65049,12.81852c2.27315,9.98067,8.41628,21.1845,18.2565,33.34021-6.17936,6.87549-11.6708,11.563-17.09552,14.61638a30.39629,30.39629,0,0,1-11.50669,3.93719,23.369,23.369,0,0,1-11.52551-1.51028,22.39753,22.39753,0,0,1-13.703-17.52482A23.61049,23.61049,0,0,1,81.19829,174.741c.53683-1.51177,1.1651-2.99542,1.94341-4.75808,1.10108-2.49409,2.26953-5.02877,3.39982-7.4798l.15178-.32926c10.34716-22.44676,21.45356-45.20313,33.01125-67.63806l.45975-.89317c1.17667-2.28716,2.3935-4.6519,3.62121-6.93693a37.11918,37.11918,0,0,1,4.24027-6.63331,15.5321,15.5321,0,0,1,23.94546-.00193,36.945,36.945,0,0,1,4.24077,6.63089c1.21632,2.26473,2.4225,4.60818,3.58908,6.87435l.49455.96109c11.5567,22.43226,22.66285,45.18863,33.011,67.639l.09332.20208c1.15008,2.49216,2.33889,5.06843,3.458,7.60554.77979,1.76553,1.40876,3.25017,1.94444,4.75659A23.63037,23.63037,0,0,1,200.13426,186.36536Z" fill="currentColor"/></svg>`;
+const spark = (arr, big) => { const W = 120, H = 26, mx = Math.max(1, ...arr), n = arr.length;
+  const pts = arr.map((v, i) => `${(i / Math.max(1, n - 1) * W).toFixed(1)},${(H - 2 - v / mx * (H - 4)).toFixed(1)}`);
+  const last = pts[pts.length - 1].split(',');
+  return `<svg class="sp${big ? ' big' : ''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="1.6" points="${pts.join(' ')}"/><circle cx="${last[0]}" cy="${last[1]}" r="2.2" fill="var(--rausch)"/></svg>`; };
+const delta = (c, p) => c === p ? `<span class="d0">–</span>` : `<span class="${c > p ? 'dup' : 'ddn'}">${c > p ? '▲' : '▼'} ${fmt(Math.abs(c - p))}</span>`;
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const wkLabel = w => { const d = new Date(w + 'T00:00:00Z'); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()]; };
+const longDate = w => { const d = new Date(w + 'T00:00:00Z'); return d.getUTCDate() + ' ' + ['January','February','March','April','May','June','July','August','September','October','November','December'][d.getUTCMonth()] + ' ' + d.getUTCFullYear(); };
+const dash = '<span class="dim">–</span>';
+const nums = s => String(s ?? '').split('|').filter(x => x !== '').map(Number);
+const th = (cols, hi) => cols.map(([k, l]) => `<th data-k="${k}"${k === hi ? ' class="s2"' : ''}>${l}</th>`).join('');
+
+/* internal pages: why the board stops where it does — the day each warehouse source had loaded at fetch time */
+const ukTime = iso => { try { return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }).replace(',', ' at') + ' UK'; } catch { return ''; } };
+function freshTable(meta) {
+  let f; try { f = JSON.parse(meta.freshness); } catch { return ''; }
+  const rows = Object.entries(f).map(([n, d]) => `<tr><td>${esc(n)}</td><td class="${d < meta.through ? 'dim' : ''}">${esc(d || '–')}${d < meta.through ? ' <span class="tg">still loading</span>' : ''}</td></tr>`).join('');
+  return `<details class="fresh"><summary>When this updates</summary><div class="hint">The board refreshes twice a day, at about 06:00 and 18:00 UK time${meta.fetched ? ` (last update ${esc(ukTime(meta.fetched))})` : ''}, and shows each day as soon as the data for it has arrived. Page views usually arrive a little later than sign-ups and bookings, so the newest day can show sign-ups before its page views; the next refresh fills those in.</div><table class="dtl" style="max-width:520px"><thead><tr><th>Data</th><th>Complete through</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+}
+function renderBody(m, { internal = false } = {}) {
+  const { meta, reps, unis, orphans } = m, SOC = meta.board === 'societies', incl = !!+meta.includeSocieties;
+  const WEEKS = String(meta.weeks).split('|'), SHOW = WEEKS.slice(-SHOW_N), TV = nums(meta.wk_verified);
+  const WHO = SOC ? 'Society' : 'Rep', WHOS = SOC ? 'societies' : 'reps';
+  const top = reps.slice(0, 3);
+  /* podium cards (kept from the original direction — they read as a leaderboard; the list didn't) */
+  const podium = [1, 0, 2].map((i, slot) => { const r = top[i]; if (!r) return ''; return `<div class="p ${['two','one','three'][slot]}"><div class="medal">${i + 1}</div><div class="who">${esc(r.name)}</div><div class="whr">${esc(r.school)}${SOC && r.owner ? ' · ' + esc(r.owner) : ''}</div><div class="big">${fmt(r.verified)}</div><div class="cap">students signed up</div><div class="meta">${fmt(r.trips)} trips · ${fmt(r.nights)} nights · ${money(r.gbv)}</div></div>`; }).join('');
+  const COLS = SOC
+    ? [['rank',''],['name','Society'],['school','University'],['owner','Rep'],['landed','Landed on page'],['verified','Signed up'],['conv','Sign-up rate'],['trips','Trips'],['nights','Nights booked'],['gbv','GBV (USD)']]
+    : [['rank',''],['name','Rep'],['school','University'],['landed','Landed on page'],['verified','Signed up'],['conv','Sign-up rate'],['trips','Trips'],['nights','Nights booked'],['gbv','GBV (USD)']];
+  /* internal pages: a totals row under the board */
+  const TOT = reps.reduce((a, r) => (a.landed += r.landed, a.verified += r.verified, a.trips += r.trips, a.nights += r.nights, a.gbv += r.gbv, a), { landed: 0, verified: 0, trips: 0, nights: 0, gbv: 0 });
+  const tfoot = !internal ? '' : `<tfoot><tr class="tot">${COLS.map(([k]) => k === 'rank' ? '<td></td>' : k === 'name' ? `<td><b>Total</b> <span class="dim">${reps.length} ${WHOS}</span></td>` : k === 'landed' ? `<td>${fmt(TOT.landed)}</td>` : k === 'verified' ? `<td><b>${fmt(TOT.verified)}</b></td>` : k === 'conv' ? `<td>${pct(TOT.verified, TOT.landed)}</td>` : k === 'trips' ? `<td>${fmt(TOT.trips)}</td>` : k === 'nights' ? `<td>${fmt(TOT.nights)}</td>` : k === 'gbv' ? `<td>${money(TOT.gbv)}</td>` : '<td></td>').join('')}</tr></tfoot>`;
+  const EXP = !SOC && incl;   /* Incl. societies view: click a rep to list every link and society behind the total */
+  const detail = r => !EXP ? '' : `<tr class="det" data-for="${esc(r.name.toLowerCase())}" data-uni="${esc(r.school)}" data-name="${esc(r.name.toLowerCase())}"><td></td><td colspan="${COLS.length - 1}"><table class="dtl"><thead><tr><th>Link</th><th>Landed on page</th><th>Signed up</th><th>Sign-up rate</th><th>Trips</th><th>Nights</th><th>GBV (USD)</th></tr></thead><tbody>${(r.detail || []).map(l => `<tr><td>${l.kind === 'soc' ? `<b>${esc(l.label)}</b> <span class="tg">society</span>` : `<code>${esc(l.label)}</code>`}</td><td class="dim">${l.landed ? fmt(l.landed) : dash}</td><td><b>${fmt(l.verified)}</b></td><td class="dim">${pct(l.verified, l.landed)}</td><td>${l.trips ? fmt(l.trips) : dash}</td><td>${l.nights ? fmt(l.nights) : dash}</td><td>${l.gbv ? money(l.gbv) : dash}</td></tr>`).join('')}</tbody></table></td></tr>`;
+  const rows = reps.map(r => `<tr${EXP ? ' class="exp" tabindex="0"' : ''} data-uni="${esc(r.school)}" data-name="${esc(r.name.toLowerCase())}"><td><span class="rk${r.rank <= 3 ? ' t' + r.rank : ''}">${r.rank}</span></td><td>${EXP ? '<span class="chev"></span>' : ''}<b>${esc(r.name)}</b>${!SOC && r.links > 1 ? ` <span class="lk">${r.links} links</span>` : ''}</td><td class="dim">${esc(r.school)}</td>${SOC ? `<td class="dim">${r.owner ? esc(r.owner) : dash}</td>` : ''}<td class="dim">${r.landed ? fmt(r.landed) : dash}</td><td><b>${fmt(r.verified)}</b></td><td class="dim">${pct(r.verified, r.landed)}</td><td>${r.trips ? fmt(r.trips) : dash}</td><td>${r.nights ? fmt(r.nights) : dash}</td><td>${r.gbv ? money(r.gbv) : dash}</td></tr>${detail(r)}`).join('');
+
+  const UCOLS = [['rank',''],['school','University'],['reps',SOC ? 'Societies' : 'Reps'],['landed','Landed on page'],['verified','Signed up'],['conv','Sign-up rate'],['perrep',SOC ? 'Per society' : 'Per rep'],['trips','Trips'],['nights','Nights booked'],['gbv','GBV (USD)']];
+  const urows = unis.map(u => `<tr><td><span class="rk${u.rank <= 3 ? ' t' + u.rank : ''}">${u.rank}</span></td><td><b>${esc(u.school)}</b></td><td class="dim">${fmt(u.reps)}</td><td class="dim">${u.landed ? fmt(u.landed) : dash}</td><td><b>${fmt(u.verified)}</b></td><td class="dim">${pct(u.verified, u.landed)}</td><td><b>${(u.verified / u.reps).toFixed(1)}</b></td><td>${u.trips ? fmt(u.trips) : dash}</td><td>${u.nights ? fmt(u.nights) : dash}</td><td>${u.gbv ? money(u.gbv) : dash}</td></tr>`).join('');
+
+  const WCOLS = [['rank',''],['name',WHO],['trend','Trend since Jan'], ...SHOW.map(w => ['w' + w, wkLabel(w)]), ['delta','vs prior wk'], ['total','Total']];
+  const wow = key => { const list = reps.map(r => ({ r, a: nums(r[key]) })).sort((x, y) => (y.a.at(-1) - x.a.at(-1)) || (y.r.verified - x.r.verified));
+    return `<div style="overflow-x:auto"><table class="wow"><thead><tr>${th(WCOLS, 'w' + SHOW.at(-1))}</tr></thead><tbody>${list.map(({ r, a }, i) => `<tr data-uni="${esc(r.school)}" data-name="${esc(r.name.toLowerCase())}"><td><span class="rk${i < 3 ? ' t' + (i + 1) : ''}">${i + 1}</span></td><td><b>${esc(r.name)}</b><div class="sub2">${esc(r.school)}</div></td><td class="tr">${spark(a)}</td>${a.slice(-SHOW_N).map((v, j, s) => `<td class="${j === s.length - 1 ? 'cur' : 'dim'}">${v ? fmt(v) : '<span class="dim">·</span>'}</td>`).join('')}<td>${delta(a.at(-1), a.at(-2) || 0)}</td><td><b>${fmt(a.reduce((x, y) => x + y, 0))}</b></td></tr>`).join('')}</tbody></table></div>`; };
+
+  const schools = String(meta.schools || '').split('|').filter(Boolean);
+  const filters = SOC ? `<div class="ctl" id="ctl" hidden>
+      <label>University <select id="f-uni"><option value="">All universities</option>${schools.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select></label>
+      <label>Find your society <input id="f-q" type="search" list="soc-list" placeholder="Start typing…" autocomplete="off"><datalist id="soc-list">${reps.map(r => `<option value="${esc(r.name)}">`).join('')}</datalist></label>
+      <span class="ctln" id="f-n"></span></div>` : '';
+  const socToggle = !SOC && +meta.hasOwners ? `<div class="seg seg2" id="segs"><button type="button" data-s="0" class="${incl ? '' : 'on'}">Own links only</button><button type="button" data-s="1" class="${incl ? 'on' : ''}">Incl. societies</button></div>` : '';
+  const note = !internal || !orphans.length ? '' : `<div class="note"><h3>${orphans.length} links excluded — not in the Parameter Mapping sheet</h3>They can't be attributed to a rep, and the numbered ones behave nothing like rep traffic: <b>${fmt(meta.orphan_landed)} landings for ${fmt(meta.orphan_verified)} sign-ups</b> (${pct(meta.orphan_verified, meta.orphan_landed)}, against ${pct(meta.verified, meta.landed)} across every mapped link). They rise and fall in lockstep with the <code>btl1–5</code> campaign links, so this is paid creator/BTL traffic on a reused <code>sa</code>, not students a rep brought in.<div style="overflow-x:auto"><table><thead><tr><th>Link</th><th>Landed</th><th>Sign-ups</th><th>Rate</th></tr></thead><tbody>${orphans.map(o => `<tr><td><b>${esc(o.sa)}</b></td><td class="dim">${fmt(o.landed)}</td><td>${fmt(o.verified)}</td><td class="dim">${pct(o.verified, o.landed)}</td></tr>`).join('')}</tbody></table></div></div>`;
+
+  return `
+<div class="bar"><div class="in">${belo}<span class="nm">Airbnb Uni Reps</span><span class="tag">${esc(meta.marketName || 'United Kingdom')}</span></div></div>
+<div class="wrap">
+  <div class="masth"><div><h1>${esc(meta.market || 'UK')} ${SOC ? 'Society' : 'Rep'} Leaderboard</h1><div class="sub">${meta.cohort ? meta.cohort + ' cohort · ' : ''}${meta.reps} ${WHOS} · data through ${longDate(meta.through)}${meta.fetched ? ' · updated ' + ukTime(meta.fetched) : ''}${!SOC && incl ? ' · including societies' : ''}</div></div>
+    <div class="seg" id="seg" hidden><button type="button" data-v="ind" class="on">${SOC ? 'Societies' : 'Individual'}</button><button type="button" data-v="uni">By university</button><button type="button" data-v="wow">Week on week</button></div></div>
+  ${reps.length && reps[0].verified > 0 ? `<div class="podium">${podium}</div>` : reps.length ? `<div class="empty"><b>No sign-ups yet${meta.cohort ? ' for the ' + esc(meta.cohort) + ' cohort' : ''}.</b> Everyone starts at 0 — the podium appears with the first sign-up.</div>` : `<div class="empty"><b>No sign-ups recorded yet${meta.cohort ? ' for the ' + esc(meta.cohort) + ' cohort' : ''}.</b> The board fills in automatically as ${WHOS === 'reps' ? 'rep' : 'society'} links go live — check back after the first shares.</div>`}
+  <div class="head"><h2>Full leaderboard</h2>${socToggle}${internal ? `<button type="button" class="csv" id="csv" data-fn="${esc((meta.market || 'UK').toLowerCase())}-${SOC ? 'societies' : 'reps'}-${esc(meta.through)}.csv">Download CSV</button>` : ''}</div>
+  <section class="view" id="v-ind"><div class="hint">${SOC ? 'One row per society. Ranked by students signed up; click any column heading to re-sort.' : `One row per rep — everyone's links are added together${incl ? ', plus every society assigned to them. Click a rep to see each link and society on its own' : ''}. Ranked by students signed up; click any column heading to re-sort.`}</div>${filters}
+    <div style="overflow-x:auto"><table id="tbl" class="flt"><thead><tr>${th(COLS, 'verified')}</tr></thead><tbody>${rows}</tbody>${tfoot}</table></div></section>
+  <section class="view" id="v-uni"><h3 class="vh" data-nojs>By university</h3><div class="hint">Every ${SOC ? 'society' : 'rep'} at each university, added together. <b>${SOC ? 'Per society' : 'Per rep'}</b> divides sign-ups by headcount — raw totals just reward the biggest team.</div>
+    <div style="overflow-x:auto"><table id="tblu"><thead><tr>${th(UCOLS, 'verified')}</tr></thead><tbody>${urows}</tbody></table></div></section>
+  <section class="view" id="v-wow"><h3 class="vh" data-nojs>Week on week</h3>
+    <div class="wowhead"><div class="hint">Weeks end Saturday. Sorted by the latest complete week (ending ${wkLabel(SHOW.at(-1))}), so whoever is active <i>now</i> is at the top. The sparkline is the whole year.</div>
+      <div class="seg seg2" id="segm" hidden><button type="button" data-m="v" class="on">Verifications</button><button type="button" data-m="l">Landed on page</button></div></div>
+    <div class="prog"><div class="pl">All ${WHOS} · verifications by week</div>${spark(TV, true)}<div class="pl2">${SHOW.map((w, i) => `<span><b>${fmt(TV[WEEKS.length - SHOW_N + i])}</b> ${wkLabel(w)}</span>`).join('')}</div></div>
+    <div id="m-v">${wow('wv')}</div><div id="m-l"><h4 class="vh" data-nojs>Landed on page</h4>${wow('wl')}</div></section>
+  ${note}
+  ${meta.freshness ? freshTable(meta) : ''}
+  <div class="foot"><b>Landed on page</b> = people who clicked your link and reached the student verification page. <b>Signed up</b> = students who then verified, credited to the last link they opened before verifying. Trips, nights and value are bookings made with the student discount, attributed to the last ${SOC ? 'society' : 'rep'} link the booker opened before booking. GBV is the booking value of those trips. Links are grouped using the Student Program Parameter Mapping sheet. <b>Figures are indicative and refresh daily. Commission is calculated separately by the programme team.</b></div>
+</div>`;
+}
+
+/* progressive enhancement: sorting, view segments, society filters. Re-run after every render. */
+const enhanceScript = `(function(){
+  var num=function(td){var s=td.textContent,v=s.replace(/[^0-9.]/g,"");return s.indexOf("k")>-1?parseFloat(v)*1000:(parseFloat(v)||0);};
+  var txt=function(td){return td.textContent.trim();}, ALPHA={name:1,school:1,type:1,owner:1};
+  function sortable(t){ if(!t) return; t.querySelectorAll("th[data-k]").forEach(function(th,idx){ var k=th.dataset.k; if(k==="rank"||k==="trend") return;
+    th.addEventListener("click",function(){ var tb=t.tBodies[0], rs=[].slice.call(tb.rows).filter(function(r){return !r.classList.contains("det");});
+      rs.sort(function(a,b){return ALPHA[k]?txt(a.cells[idx]).localeCompare(txt(b.cells[idx])):num(b.cells[idx])-num(a.cells[idx]);});
+      rs.forEach(function(r,i){var s=r.cells[0].firstChild; s.textContent=i+1; s.className="rk"+(i<3?" t"+(i+1):""); tb.appendChild(r); var d=r.dataset.name&&tb.querySelector('tr.det[data-for="'+r.dataset.name.replace(/"/g,'\\"')+'"]'); if(d) tb.appendChild(d);});
+      t.querySelectorAll("th").forEach(function(x){x.classList.remove("s2")}); th.classList.add("s2"); }); }); }
+  document.querySelectorAll("table:not(.dtl)").forEach(sortable);
+  document.querySelectorAll("tr.exp").forEach(function(r){ var go=function(){r.classList.toggle("open");}; r.addEventListener("click",go); r.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}}); });
+  /* CSV export (internal pages): the visible rows of #tbl as shown, numbers unformatted */
+  var csvb=document.getElementById("csv"); if(csvb){ csvb.addEventListener("click",function(){
+    var t=document.getElementById("tbl"); if(!t) return; var cell=function(c,i){ var b=i===1&&c.querySelector("b"); var v=(b?b.textContent:c.textContent).trim().replace(/\\s+/g," "); if(/^[$]?[0-9][0-9,]*$/.test(v)) v=v.replace(/[$,]/g,""); if(v==="–") v=""; return v; };
+    var out=[[].map.call(t.tHead.rows[0].cells,function(c){return c.textContent.trim()||"Rank";})];
+    [].forEach.call(t.tBodies[0].rows,function(r){ if(r.hidden||r.classList.contains("det")) return; out.push([].map.call(r.cells,cell)); });
+    if(t.tFoot) out.push([].map.call(t.tFoot.rows[0].cells,cell));
+    var csv=out.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\\n");
+    var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download=csvb.dataset.fn||"leaderboard.csv"; document.body.appendChild(a); a.click(); a.remove(); }); }
+  var seg=document.getElementById("seg"), views={ind:document.getElementById("v-ind"),uni:document.getElementById("v-uni"),wow:document.getElementById("v-wow")};
+  if(!seg||!views.ind||!views.uni||!views.wow) return;
+  var segm=document.getElementById("segm"), mv=document.getElementById("m-v"), ml=document.getElementById("m-l");
+  if(segm&&mv&&ml){ var showM=function(m){mv.hidden=(m!=="v"); ml.hidden=(m!=="l"); segm.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===m);});};
+    segm.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){showM(b.dataset.m);});}); segm.hidden=false; showM("v"); }
+  var show=function(v){ for(var k in views) views[k].hidden=(k!==v); seg.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v);}); try{localStorage.setItem("ukreps.view",v);}catch(e){} };
+  seg.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.v);});});
+  document.querySelectorAll("[data-nojs]").forEach(function(x){x.hidden=true;}); seg.hidden=false;
+  var saved; try{saved=localStorage.getItem("ukreps.view");}catch(e){} show(views[saved]?saved:"ind");
+  /* society filters: the full board renders first; filtering only narrows it */
+  var ctl=document.getElementById("ctl"); if(ctl){ var uni=document.getElementById("f-uni"), q=document.getElementById("f-q"), n=document.getElementById("f-n");
+    var apply=function(){ var u=uni.value, s=(q.value||"").trim().toLowerCase(), shown=0, total=0;
+      document.querySelectorAll("table.flt tbody tr").forEach(function(r){ if(!r.classList.contains("det")) total++; var ok=(!u||r.dataset.uni===u)&&(!s||r.dataset.name.indexOf(s)>-1); r.hidden=!ok; if(ok&&!r.classList.contains("det")) shown++; });
+      n.textContent=(u||s)?("Showing "+shown+" of "+total):""; };
+    uni.addEventListener("change",apply); q.addEventListener("input",apply); ctl.hidden=false; }
+})();`;
+
+const CSS = `
+  .fresh{margin:32px 0 8px;font-size:14px;line-height:20px}.fresh summary{cursor:pointer;font-weight:600;color:var(--hof)}.fresh .hint{margin:8px 0 12px}
+  /* internal extras: totals row, CSV button */
+  tfoot tr.tot td{border-top:1px solid var(--hof);border-bottom:0;padding-top:12px;font-weight:500}
+  .csv{font:inherit;font-size:14px;line-height:18px;font-weight:600;padding:8px 14px;border:1px solid var(--hof);border-radius:var(--r8);background:#fff;color:var(--hof);cursor:pointer;margin-left:12px}
+  .csv:hover{background:var(--faint)}
+  /* expandable rep rows (Incl. societies view) */
+  tr.exp{cursor:pointer}
+  tr.exp .chev{display:inline-block;width:6px;height:6px;border-right:1.5px solid var(--foggy);border-bottom:1.5px solid var(--foggy);transform:rotate(-45deg);margin:0 10px 2px 2px;transition:transform .15s}
+  tr.exp.open .chev{transform:rotate(45deg)}
+  tr.det{display:none}
+  tr.exp.open + tr.det{display:table-row}
+  tr.det>td{padding-top:0;padding-bottom:16px;background:var(--faint)}
+  tr.exp.open>td{background:var(--faint)}
+  .dtl{width:100%;font-size:13px;line-height:18px;margin-top:4px}
+  .dtl th{font-size:11px;letter-spacing:.02em;color:var(--foggy);font-weight:500;padding:6px 10px;border-bottom:1px solid var(--deco);text-align:right}
+  .dtl th:first-child,.dtl td:first-child{text-align:left}
+  .dtl td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--bebe)}
+  .dtl tr:last-child td{border-bottom:0}
+  .dtl code{font:inherit;color:var(--hof)}
+  .tg{font-size:11px;line-height:16px;color:var(--foggy);border:1px solid var(--deco);border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:middle}
+  /* editorial direction (chosen 2 Sept): white page, hairline KPI row, top three as a list, Rausch only on the winning figure */
+  .masth{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:56px 0 40px;padding-bottom:24px;border-bottom:1px solid var(--hof)}
+  .masth h1{font-size:40px;line-height:44px;font-weight:600;margin:0;letter-spacing:-.01em;color:var(--hof)}
+  .masth .sub{font-size:16px;line-height:22px;color:var(--foggy);margin-top:8px}
+  .masth .seg{margin-left:auto}
+  @media(max-width:900px){.masth{margin:24px 0 20px;padding-bottom:16px;gap:12px}.masth h1{font-size:28px;line-height:32px}.masth .sub{font-size:14px;line-height:18px;margin-top:4px}.masth .seg{margin-left:0}.seg button{padding:8px 12px}.empty{margin:24px 0;padding:20px 16px;font-size:14px;line-height:20px}}
+  @media(max-width:680px){
+    /* narrow screens: keep rank · name · signed up · nights · GBV, drop the rest */
+    #tbl th:nth-child(3),#tbl td:nth-child(3),#tbl th:nth-child(4),#tbl td:nth-child(4),#tbl th:nth-child(6),#tbl td:nth-child(6),#tbl th:nth-child(7),#tbl td:nth-child(7){display:none}}
+
+  /* Airbnb Cereal — DLS fontFamilyCereal; Book/Medium/Bold faces map to weightBook400 / Medium500 / Semibold600+Bold700 */
+  @font-face{font-family:'Airbnb Cereal';font-weight:400;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Book-9a1c9cca9bb3d65fefa2aa487617805e.woff2") format("woff2")}
+  @font-face{font-family:'Airbnb Cereal';font-weight:500;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Medium-50fc004b3082375f12ff0cfb67bf8e56.woff2") format("woff2")}
+  @font-face{font-family:'Airbnb Cereal';font-weight:600 700;font-display:swap;src:url("https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/Airbnb_Cereal-Bold-bdfb98485e7836ba31b456f65cded088.woff2") format("woff2")}
+
+  /* DLS tokens — colors.md / corner-radius.md / elevation.md / spacing.md / typography.md */
+  :root{
+    --hof:#222222;--foggy:#6A6A6A;--bobo:#B0B0B0;--deco:#DDDDDD;--bebe:#EBEBEB;--faint:#F7F7F7;--white:#FFFFFF;
+    --rausch:#FF385C;--product-rausch:#E00B41;--spruce:#008A05;--arches:#C13515;--ondo:#E07912;--capiz:#F7F6F2;
+    --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r32:32px;
+    --e0:0 0 0 1px #DDDDDD inset;
+    --e1:0 0 0 1px rgba(0,0,0,.02),0 2px 4px rgba(0,0,0,.16);
+    --e2:0 0 0 1px rgba(0,0,0,.02),0 2px 6px rgba(0,0,0,.04),0 4px 8px rgba(0,0,0,.10);
+    --e3:0 0 0 1px rgba(0,0,0,.02),0 8px 24px rgba(0,0,0,.10);
+    --g1:#E8B84B;--g2:#B0B0B0;--g3:#C98A5B;   /* medal colours — leaderboard idiom, not DLS */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--white);color:var(--hof);-webkit-font-smoothing:antialiased;
+    font-family:'Airbnb Cereal','Airbnb Cereal VF','Circular',-apple-system,BlinkMacSystemFont,'Roboto','Helvetica Neue',sans-serif;
+    font-size:14px;line-height:18px;font-weight:400}                        /* body.text_14_18 */
+  b,strong{font-weight:600}
+
+  /* top bar */
+  .bar .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:8px;color:var(--rausch)}
+  .bar .nm{font-size:16px;line-height:20px;font-weight:600;color:var(--hof)}   /* titles.semibold_16_20 */
+  .bar .tag{margin-left:auto;font-size:12px;line-height:16px;color:var(--foggy)} /* caption.text_12_16 */
+
+  /* hero — rauschGradient.linearGradient is left-to-right */
+  .hero{background:linear-gradient(90deg,var(--rausch) 0%,var(--product-rausch) 100%);color:#fff;padding:48px 24px 56px;text-align:center}
+  .hero h1{font-size:40px;line-height:44px;font-weight:600;margin:0;letter-spacing:-.01em} /* specialDisplay.medium_40_44 */
+  .hero .sub{font-size:16px;line-height:22px;margin-top:8px;opacity:.92}                /* subtitles.book_16_22 */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px 64px}
+
+  /* KPI strip — cards on elevation1, medium12px radius, micro16/24 padding */
+  .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:-28px 0 40px}
+  .s{text-align:center;padding:20px 16px;border-radius:var(--r12);background:var(--white);box-shadow:var(--e1)}
+  .s .v{font-size:26px;line-height:30px;font-weight:600}                                /* titles.semibold_26_30 */
+  .s .l{font-size:12px;line-height:16px;color:var(--foggy);margin-top:4px;text-transform:uppercase;letter-spacing:.04em} /* caption + trackingWide */
+
+  /* podium */
+  .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:end;margin-bottom:40px}
+  @media(max-width:680px){
+    /* phone: all three podium cards on screen at once, side by side like desktop, scaled to the viewport */
+    .podium{grid-template-columns:1fr 1.15fr 1fr;gap:8px;margin-bottom:24px;align-items:end}
+    .p{padding:12px 6px;border-radius:var(--r12)}
+    .p.one{padding:16px 6px;box-shadow:0 0 0 1px rgba(0,0,0,.02),0 2px 6px rgba(0,0,0,.04),0 4px 8px rgba(0,0,0,.10)}
+    .medal{width:26px;height:26px;font-size:12px;margin-bottom:6px}.one .medal{width:32px;height:32px;font-size:14px}
+    .p .who{font-size:clamp(12px,3.6vw,15px);line-height:1.2;overflow-wrap:break-word}.one .who{font-size:clamp(14px,4.2vw,17px)}
+    .p .whr{font-size:clamp(9px,2.6vw,12px);line-height:1.3;overflow-wrap:break-word;hyphens:auto}
+    .p .big{font-size:clamp(22px,7vw,30px);line-height:1.05;margin-top:6px}.one .big{font-size:clamp(28px,9vw,38px)}
+    .p .cap{font-size:9px;line-height:12px;letter-spacing:0}
+    .p .meta{display:none}   /* trips · nights · GBV live in the table on phones */
+    .seg{display:flex;width:100%}.seg button{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap}
+    th{padding:0 8px 10px;font-size:11px}td{padding:12px 8px}   /* rank · name · signed up · nights · GBV fit a 375px screen */
+    .lk{display:none}        /* the links chip is diagnostic; it costs half a column on a phone */
+    .dtl th:nth-child(2),.dtl td:nth-child(2),.dtl th:nth-child(4),.dtl td:nth-child(4),.dtl th:nth-child(5),.dtl td:nth-child(5){display:none}
+    .seg{display:flex;width:100%}.seg button{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap}
+    th{padding:0 8px 10px;font-size:11px}td{padding:12px 8px}   /* rank · name · signed up · nights · GBV fit a 375px screen */}
+  .p{border-radius:var(--r16);padding:24px 16px;text-align:center;background:var(--white);box-shadow:var(--e0)}
+  .p.one{box-shadow:var(--e2);padding:32px 16px}
+  .medal{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;margin:0 auto 12px;background:var(--g2)}
+  .one .medal{background:var(--g1);width:44px;height:44px;font-size:18px}
+  .three .medal{background:var(--g3)}
+  .p .who{font-size:18px;line-height:24px;font-weight:600}       /* titles.semibold_18_24 */
+  .one .who{font-size:22px;line-height:26px}                     /* titles.semibold_22_26 */
+  .p .whr{font-size:14px;line-height:18px;color:var(--foggy)}    /* subtitles.book_14_18 */
+  .p .big{font-size:32px;line-height:36px;font-weight:600;color:var(--rausch);margin-top:12px} /* titles.semibold_32_36 */
+  .one .big{font-size:40px;line-height:44px}
+  .p .cap{font-size:12px;line-height:16px;color:var(--foggy);text-transform:uppercase;letter-spacing:.04em}
+  .p .meta{font-size:14px;line-height:18px;color:var(--foggy);margin-top:12px;padding-top:12px;border-top:1px solid var(--bebe)}
+
+  /* section head + segmented control (pill: xxxlarge32px, faint track, elevation1 thumb) */
+  h2{font-size:22px;line-height:26px;font-weight:600;margin:0}   /* titles.semibold_22_26 */
+  .head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .seg{margin-left:auto;display:inline-flex;border-radius:var(--r32);padding:4px;background:var(--faint)}
+  .seg button{font:inherit;font-size:14px;line-height:18px;font-weight:500;color:var(--foggy);background:none;border:0;
+    padding:8px 16px;border-radius:var(--r32);cursor:pointer;transition:background .2s cubic-bezier(.2,0,0,1),color .2s}
+  .seg button:hover{color:var(--hof)}
+  .seg button.on{background:var(--white);color:var(--hof);box-shadow:var(--e1)}
+  .seg2{margin-left:0}
+  .hint{font-size:14px;line-height:20px;color:var(--foggy);margin-bottom:16px}       /* bodyParagraphs.text_14_20 */
+  .vh{font-size:18px;line-height:24px;font-weight:600;margin:16px 0 4px}
+  .view[hidden]{display:none}
+
+  /* tables — bebe hairlines, 16px rows, caption headers */
+  table{width:100%;border-collapse:collapse;font-size:14px;line-height:18px}
+  th{font-size:12px;line-height:16px;font-weight:500;color:var(--foggy);padding:0 12px 12px;text-align:right;white-space:nowrap}
+  th[data-k]{cursor:pointer}th[data-k]:hover{color:var(--hof)}th.s2{color:var(--hof);font-weight:600;box-shadow:inset 0 -2px 0 var(--hof)}
+  th:nth-child(1),th:nth-child(2),th:nth-child(3),th:nth-child(4){text-align:left}
+  .wow th:nth-child(3){text-align:left}
+  td{padding:14px 12px;text-align:right;border-top:1px solid var(--bebe);white-space:nowrap}
+  td:nth-child(1),td:nth-child(2),td:nth-child(3),td:nth-child(4){text-align:left}
+  .wow td:nth-child(4){text-align:right}
+  td .dim,td.dim{color:var(--foggy)}
+  tbody tr:hover{background:var(--faint)}
+  .rk{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--faint);align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--foggy)}
+  .rk.t1{background:var(--g1);color:#fff}.rk.t2{background:var(--g2);color:#fff}.rk.t3{background:var(--g3);color:#fff}
+  .lk{font-size:12px;line-height:16px;color:var(--foggy);margin-left:8px;box-shadow:var(--e0);border-radius:var(--r32);padding:2px 8px;cursor:help}
+  .bdg{font-size:12px;line-height:16px;color:var(--hof);background:var(--faint);border-radius:var(--r4);padding:2px 8px;white-space:nowrap}
+  .sub2{font-size:12px;line-height:16px;color:var(--foggy);font-weight:400}
+
+  /* week-on-week */
+  .wowhead{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .wowhead .hint{flex:1;min-width:260px}
+  .sp{color:var(--bobo);display:block}
+  .sp.big{width:100%;height:56px;color:var(--rausch)}
+  td.tr{padding-top:8px;padding-bottom:8px}
+  .wow td.cur{font-weight:600}
+  .dup{color:var(--spruce);font-weight:600}.ddn{color:var(--arches);font-weight:600}.d0{color:var(--bobo)}
+  .prog{border-radius:var(--r12);box-shadow:var(--e0);padding:16px 16px 12px;margin:16px 0 24px;background:var(--white)}
+  .pl{font-size:12px;line-height:16px;color:var(--foggy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+  .pl2{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;line-height:16px;color:var(--foggy);margin-top:8px}
+  .pl2 b{color:var(--hof)}
+  #m-l[hidden]{display:none}#m-v[hidden]{display:none}
+
+  /* excluded-links note — InlineBanner-style: capiz surface, ondo accent */
+  .note{border-radius:var(--r12);background:var(--capiz);border-left:4px solid var(--ondo);padding:16px 20px;margin:40px 0 0;font-size:14px;line-height:20px}
+  .note h3{margin:0 0 4px;font-size:16px;line-height:20px;font-weight:600}
+  .note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:var(--r4)}
+  .note table{margin-top:12px;font-size:14px}
+  .note th,.note td{text-align:right;padding:10px 12px}.note th:first-child,.note td:first-child{text-align:left}
+  .foot{font-size:12px;line-height:16px;color:var(--foggy);margin-top:24px;border-top:1px solid var(--bebe);padding-top:16px}
+
+  .empty{margin:40px 0;padding:32px 24px;border-radius:var(--r12);box-shadow:var(--e0);text-align:center;font-size:16px;line-height:22px;color:var(--foggy)}
+  .empty b{color:var(--hof);font-weight:600}
+  .ctl{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin:0 0 16px}
+  .ctl label{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:16px;color:var(--foggy)}
+  .ctl select,.ctl input{font:inherit;font-size:14px;line-height:18px;color:var(--hof);background:var(--white);border:1px solid var(--deco);border-radius:var(--r8);padding:10px 12px;min-width:220px}
+  .ctl select:focus,.ctl input:focus{outline:2px solid var(--hof);outline-offset:1px}
+  .ctln{font-size:12px;line-height:16px;color:var(--foggy);padding-bottom:12px}
+  .ctl[hidden]{display:none}
+  tr[hidden]{display:none}`;
+const head = title => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><link rel="preconnect" href="https://a0.muscache.com" crossorigin><style>${CSS}</style></head>`;
+
+(async function(){
+  /* ---- passcode gate ---- */
+  var HASH='141af6f66464d8d58d3b03f7621311f809903b1c8c10b3de31547464a61c9d55';
+  var sha=async function(t){ var b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join(''); };
+  var ok=false; try{ ok=localStorage.getItem('ukreps.gate')===HASH; }catch(e){}
+  if(!ok){
+    await new Promise(function(resolve){
+      document.getElementById('app').innerHTML='<div class="bar"><div class="in">'+belo+'<span class="nm">Airbnb Uni Reps</span><span class="tag">France</span></div></div>'+
+        '<div class="gate"><form class="gcard" id="gf"><div class="logo">'+belo+'</div><h2>FR Rep Leaderboard</h2><p>Enter the passcode you were given to see the board.</p>'+
+        '<input id="gi" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Passcode" autofocus><button type="submit">Continue</button><div class="gerr" id="ge"></div></form></div>';
+      var f=document.getElementById('gf'), i=document.getElementById('gi'), e=document.getElementById('ge');
+      f.addEventListener('submit', async function(ev){ ev.preventDefault(); var h=await sha(i.value.trim().toLowerCase());
+        if(h===HASH){ try{localStorage.setItem('ukreps.gate',HASH);}catch(x){} resolve(); }
+        else { e.textContent='That passcode is not right — check with your programme contact.'; i.select(); } });
+    });
+    document.getElementById('app').innerHTML='<div class="bar"><div class="in">'+belo+'<span class="nm">Airbnb Uni Reps</span><span class="tag">France</span></div></div><div class="hero"><h1>FR Rep Leaderboard</h1><div class="sub" id="status">Loading the latest numbers…</div></div>';
+  }
+  /* ---- data ---- */
+  var SHEET='1MtuFRzi-pAJr1VXh7bQwdEyjzLvyz37y4XK82fgEUJk', BOARD='reps', TABS=['fr_meta','fr_links','fr_weekly'];
+  /* headers=1: gviz treats row 1 as column labels, so header text survives in numeric columns */
+  var gviz=function(tab){ return fetch('https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx=out:json&headers=1&sheet='+tab,{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status+' on '+tab); return r.text(); })
+    .then(function(t){ var j=JSON.parse(t.slice(t.indexOf('(')+1, t.lastIndexOf(')')));
+      if(j.status!=='ok') throw new Error(tab+': '+(j.errors&&j.errors[0]&&j.errors[0].detailed_message||'bad response'));
+      var header=j.table.cols.map(function(c){ return c.label||''; });
+      var body=j.table.rows.map(function(r){ return r.c.map(function(c){ return c&&c.v!=null? c.v : ''; }); });
+      return [header].concat(body); }); };
+  var enhance=function(){ (function(){
+  var num=function(td){var s=td.textContent,v=s.replace(/[^0-9.]/g,"");return s.indexOf("k")>-1?parseFloat(v)*1000:(parseFloat(v)||0);};
+  var txt=function(td){return td.textContent.trim();}, ALPHA={name:1,school:1,type:1,owner:1};
+  function sortable(t){ if(!t) return; t.querySelectorAll("th[data-k]").forEach(function(th,idx){ var k=th.dataset.k; if(k==="rank"||k==="trend") return;
+    th.addEventListener("click",function(){ var tb=t.tBodies[0], rs=[].slice.call(tb.rows).filter(function(r){return !r.classList.contains("det");});
+      rs.sort(function(a,b){return ALPHA[k]?txt(a.cells[idx]).localeCompare(txt(b.cells[idx])):num(b.cells[idx])-num(a.cells[idx]);});
+      rs.forEach(function(r,i){var s=r.cells[0].firstChild; s.textContent=i+1; s.className="rk"+(i<3?" t"+(i+1):""); tb.appendChild(r); var d=r.dataset.name&&tb.querySelector('tr.det[data-for="'+r.dataset.name.replace(/"/g,'\"')+'"]'); if(d) tb.appendChild(d);});
+      t.querySelectorAll("th").forEach(function(x){x.classList.remove("s2")}); th.classList.add("s2"); }); }); }
+  document.querySelectorAll("table:not(.dtl)").forEach(sortable);
+  document.querySelectorAll("tr.exp").forEach(function(r){ var go=function(){r.classList.toggle("open");}; r.addEventListener("click",go); r.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}}); });
+  /* CSV export (internal pages): the visible rows of #tbl as shown, numbers unformatted */
+  var csvb=document.getElementById("csv"); if(csvb){ csvb.addEventListener("click",function(){
+    var t=document.getElementById("tbl"); if(!t) return; var cell=function(c,i){ var b=i===1&&c.querySelector("b"); var v=(b?b.textContent:c.textContent).trim().replace(/\s+/g," "); if(/^[$]?[0-9][0-9,]*$/.test(v)) v=v.replace(/[$,]/g,""); if(v==="–") v=""; return v; };
+    var out=[[].map.call(t.tHead.rows[0].cells,function(c){return c.textContent.trim()||"Rank";})];
+    [].forEach.call(t.tBodies[0].rows,function(r){ if(r.hidden||r.classList.contains("det")) return; out.push([].map.call(r.cells,cell)); });
+    if(t.tFoot) out.push([].map.call(t.tFoot.rows[0].cells,cell));
+    var csv=out.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download=csvb.dataset.fn||"leaderboard.csv"; document.body.appendChild(a); a.click(); a.remove(); }); }
+  var seg=document.getElementById("seg"), views={ind:document.getElementById("v-ind"),uni:document.getElementById("v-uni"),wow:document.getElementById("v-wow")};
+  if(!seg||!views.ind||!views.uni||!views.wow) return;
+  var segm=document.getElementById("segm"), mv=document.getElementById("m-v"), ml=document.getElementById("m-l");
+  if(segm&&mv&&ml){ var showM=function(m){mv.hidden=(m!=="v"); ml.hidden=(m!=="l"); segm.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===m);});};
+    segm.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){showM(b.dataset.m);});}); segm.hidden=false; showM("v"); }
+  var show=function(v){ for(var k in views) views[k].hidden=(k!==v); seg.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v);}); try{localStorage.setItem("ukreps.view",v);}catch(e){} };
+  seg.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.v);});});
+  document.querySelectorAll("[data-nojs]").forEach(function(x){x.hidden=true;}); seg.hidden=false;
+  var saved; try{saved=localStorage.getItem("ukreps.view");}catch(e){} show(views[saved]?saved:"ind");
+  /* society filters: the full board renders first; filtering only narrows it */
+  var ctl=document.getElementById("ctl"); if(ctl){ var uni=document.getElementById("f-uni"), q=document.getElementById("f-q"), n=document.getElementById("f-n");
+    var apply=function(){ var u=uni.value, s=(q.value||"").trim().toLowerCase(), shown=0, total=0;
+      document.querySelectorAll("table.flt tbody tr").forEach(function(r){ if(!r.classList.contains("det")) total++; var ok=(!u||r.dataset.uni===u)&&(!s||r.dataset.name.indexOf(s)>-1); r.hidden=!ok; if(ok&&!r.classList.contains("det")) shown++; });
+      n.textContent=(u||s)?("Showing "+shown+" of "+total):""; };
+    uni.addEventListener("change",apply); q.addEventListener("input",apply); ctl.hidden=false; }
+})(); };
+  try {
+    var t={}; var got=await Promise.all(TABS.map(gviz)); ['meta','links','weekly'].forEach(function(k,i){ t[k]=got[i]; });
+    var raw=fromRawTables(t);
+    var render=function(incl){
+      var model=prepare(raw.ROWS, raw.PMAP, raw.WK, {through: raw.through, board: BOARD, includeSocieties: !!incl, cohort: raw.cohort, market: 'FR', marketName: 'France'});
+      document.getElementById('app').innerHTML=renderBody(model);
+      enhance();
+      var segs=document.getElementById('segs');
+      if(segs){ segs.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ try{localStorage.setItem('ukreps.incl',b.dataset.s);}catch(e){} render(b.dataset.s==='1'); }); }); }
+    };
+    var saved=null; try{ saved=localStorage.getItem('ukreps.incl'); }catch(e){}
+    render(BOARD==='reps' && saved==='1');
+  } catch(e) {
+    document.getElementById('status').innerHTML='The leaderboard couldn\'t load right now — please try again in a few minutes.<br><span style="opacity:.7;font-size:12px">'+String(e.message).replace(/</g,'&lt;')+'</span>';
+  }
+})();
+</script></body></html>
